@@ -1,0 +1,45 @@
+Entendido. Quieres reemplazar el archivo `index.html` genérico de Firebase por tu `dashboard_estadistico.html` para que sea lo primero que se vea.
+
+Aquí tienes las instrucciones para la terminal o CLI de tu computadora (Linux, macOS, o Git Bash/WSL en Windows).
+
+### Instrucciones para el CLI:
+
+Asumiendo que te encuentras en la carpeta principal de tu proyecto (la que contiene el directorio `dashboard-web`):
+
+**Comando:**
+
+```bash
+cp dashboard-web/dashboard_estadistico.html dashboard-web/index.html
+```
+
+**Explicación:**
+
+Este comando le dice a tu sistema:
+
+1.  **`cp` (Copiar):** Toma el archivo fuente.
+2.  **`dashboard-web/dashboard_estadistico.html`:** Este es tu archivo fuente (el dashboard que funciona).
+3.  **`dashboard-web/index.html`:** Este es el archivo de destino.
+
+El comando **sobrescribirá** el `index.html` vacío con el contenido exacto de tu `dashboard_estadistico.html`.
+
+-----
+
+**Alternativa (Si ya estás dentro de la carpeta `dashboard-web`):**
+
+Si primero navegas a la carpeta:
+
+```bash
+cd dashboard-web
+```
+
+Entonces el comando es más simple:
+
+```bash
+cp dashboard_estadistico.html index.html
+```
+
+-----
+
+**Resultado:**
+
+Después de ejecutar este comando, cuando vuelvas a desplegar tu proyecto en Firebase (`firebase deploy`), el archivo `index.html` (que es el que se sirve por defecto) será tu dashboard estadístico funcional.
