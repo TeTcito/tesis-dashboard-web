@@ -3,58 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Estadístico de Atención Lectora</title>
-    <!-- Tailwind CSS para un diseño moderno -->
+    <title>Dashboard de Atención</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js para los gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts para una mejor tipografía -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Clases personalizadas para los colores de estado */
+        body { font-family: 'Inter', sans-serif; }
         .status-atento { background-color: #28a745; color: white; }
         .status-sin-atencion-visual { background-color: #ffc107; color: #333; }
         .status-ojos-cerrados { background-color: #17a2b8; color: white; }
         .status-distraccion { background-color: #dc3545; color: white; }
         .status-iniciando { background-color: #6c757d; color: white; }
-        /* Estilo para el botón de estudiante activo */
-        .student-btn.active {
-            background-color: #4f46e5;
-            color: white;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
+        .status-habla-fluida { background-color: #007bff; color: white; }
+        .status-habla-lenta { background-color: #fd7e14; color: white; }
+        .status-dificultad { background-color: #e83e8c; color: white; }
+        .status-escuchando { background-color: #6c757d; color: white; }
+        .student-btn.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 p-4 sm:p-6 lg:p-8">
 
     <div class="max-w-7xl mx-auto">
-        <!-- Encabezado -->
         <header class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-900">Dashboard de Atención Lectora</h1>
-            <!-- Selector de Estudiantes -->
+            <h1 class="text-3xl font-bold text-gray-900">Dashboard de Atención Multimodal</h1>
             <div class="mt-4 flex items-center space-x-2 flex-wrap">
-                <span class="text-gray-500 font-medium mr-2">Seleccionar Estudiante:</span>
+                <span class="text-gray-500 font-medium mr-2">Estudiante:</span>
                 <button id="btn-est_01" onclick="changeStudent('est_01')" class="student-btn px-4 py-2 rounded-lg bg-white shadow font-semibold text-gray-700 transition-all duration-200 mb-2">Estudiante 01</button>
                 <button id="btn-est_02" onclick="changeStudent('est_02')" class="student-btn px-4 py-2 rounded-lg bg-white shadow font-semibold text-gray-700 transition-all duration-200 mb-2">Estudiante 02</button>
-                <!-- [NUEVO] Botones para Estudiantes 03 y 04 -->
                 <button id="btn-est_03" onclick="changeStudent('est_03')" class="student-btn px-4 py-2 rounded-lg bg-white shadow font-semibold text-gray-700 transition-all duration-200 mb-2">Estudiante 03</button>
                 <button id="btn-est_04" onclick="changeStudent('est_04')" class="student-btn px-4 py-2 rounded-lg bg-white shadow font-semibold text-gray-700 transition-all duration-200 mb-2">Estudiante 04</button>
             </div>
         </header>
 
-        <!-- Contenedor principal del Dashboard (Grid) -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <!-- Columna Izquierda: KPIs y Estado en Vivo -->
             <div class="lg:col-span-1 space-y-6">
-                <!-- Tarjeta de Estado en Tiempo Real -->
+                
                 <div id="statusCard" class="p-6 rounded-2xl shadow-lg transition-all duration-500 status-iniciando">
-                    <h2 class="text-sm font-medium opacity-80 mb-2">ESTADO ACTUAL</h2>
+                    <h2 class="text-sm font-medium opacity-80 mb-2">ATENCIÓN VISUAL</h2>
                     <div class="flex items-center space-x-4">
                         <div id="statusIcon" class="text-5xl">⏳</div>
                         <div>
@@ -64,23 +53,43 @@
                     </div>
                 </div>
 
-                <!-- Tarjetas de Resumen (KPIs) -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-white p-4 rounded-2xl shadow"><h3 class="text-sm text-gray-500">Alertas Totales</h3><p id="kpiAlerts" class="text-3xl font-bold text-red-500">0</p></div>
-                    <div class="bg-white p-4 rounded-2xl shadow"><h3 class="text-sm text-gray-500">% Tiempo en Foco</h3><p id="kpiFocusTime" class="text-3xl font-bold text-green-500">0%</p></div>
-                    <div class="bg-white p-4 rounded-2xl shadow col-span-2"><h3 class="text-sm text-gray-500">Duración de Sesión</h3><p id="kpiSessionDuration" class="text-2xl font-bold text-gray-700">00:00</p></div>
+                <div id="speechStatusCard" class="p-6 rounded-2xl shadow-lg transition-all duration-500 status-escuchando">
+                    <h2 class="text-sm font-medium opacity-80 mb-2">FLUIDEZ DEL HABLA</h2>
+                    <div class="flex items-center space-x-4">
+                        <div id="speechStatusIcon" class="text-5xl">🎧</div>
+                        <div>
+                            <div id="speechStatusText" class="text-2xl font-bold">Escuchando...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow">
+                    <h3 class="font-semibold mb-3">Resumen de Atención Visual</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><h3 class="text-sm text-gray-500">Alertas (Distracción)</h3><p id="kpiAlerts" class="text-3xl font-bold text-red-500">0</p></div>
+                        <div><h3 class="text-sm text-gray-500">% Tiempo en Foco</h3><p id="kpiFocusTime" class="text-3xl font-bold text-green-500">0%</p></div>
+                        <div class="col-span-2"><h3 class="text-sm text-gray-500">Duración de Sesión</h3><p id="kpiSessionDuration" class="text-2xl font-bold text-gray-700">00:00</p></div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-5 rounded-2xl shadow">
+                    <h3 class="font-semibold mb-3">Resumen de Fluidez Vocal</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><h3 class="text-sm text-gray-500">Alertas (Fluidez)</h3><p id="kpiSpeechAlerts" class="text-3xl font-bold text-orange-500">0</p></div>
+                        <div><h3 class="text-sm text-gray-500">Velocidad (PPM)</h3><p id="kpiSpeechPPM" class="text-3xl font-bold text-blue-500">0</p></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Columna Derecha: Gráficos -->
             <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white p-6 rounded-2xl shadow"><h3 class="font-semibold mb-4">Resumen de la Sesión (Por Tiempo)</h3><div class="h-64 flex justify-center items-center"><canvas id="summaryChart"></canvas></div></div>
-                <div class="bg-white p-6 rounded-2xl shadow"><h3 class="font-semibold mb-4">Línea de Tiempo de Atención</h3><div class="h-64"><canvas id="timelineChart"></canvas></div></div>
+                <div class="bg-white p-6 rounded-2xl shadow">
+                    <h3 class="font-semibold mb-4">Resumen de la Sesión por Minuto</h3>
+                    <div class="h-96"><canvas id="timelineChart"></canvas></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- SDK de Firebase (versión más reciente) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
@@ -98,10 +107,11 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // --- Lógica para Dashboard Dinámico ---
+        // --- Lógica del Dashboard ---
         let currentStudentId = '';
         let realtimeStatusRef, logsRef;
 
+        // Elementos del DOM
         const statusCard = document.getElementById('statusCard');
         const statusIcon = document.getElementById('statusIcon');
         const statusText = document.getElementById('statusText');
@@ -109,29 +119,48 @@
         const kpiAlerts = document.getElementById('kpiAlerts');
         const kpiFocusTime = document.getElementById('kpiFocusTime');
         const kpiSessionDuration = document.getElementById('kpiSessionDuration');
-        const summaryCtx = document.getElementById('summaryChart').getContext('2d');
+        const speechStatusCard = document.getElementById('speechStatusCard');
+        const speechStatusIcon = document.getElementById('speechStatusIcon');
+        const speechStatusText = document.getElementById('speechStatusText');
+        const kpiSpeechAlerts = document.getElementById('kpiSpeechAlerts');
+        const kpiSpeechPPM = document.getElementById('kpiSpeechPPM');
+        
+        // Gráficos
         const timelineCtx = document.getElementById('timelineChart').getContext('2d');
-        let summaryChart, timelineChart, chartUpdateTimeout;
-        const CHART_UPDATE_INTERVAL = 2000;
+        let timelineChart, chartUpdateTimeout;
+        const CHART_UPDATE_INTERVAL = 5000; // [MODIFICADO] Actualizar gráfico solo cada 5 seg para rendimiento
 
-        const statusConfig = {
+        // Configuración de estados
+        const attentionStatusConfig = {
             'ATENTO': { label: 'Atento', icon: '✅', color: '#28a745', class: 'status-atento' },
             'SIN ATENCION VISUAL': { label: 'Sin Atención', icon: '⚠️', color: '#ffc107', class: 'status-sin-atencion-visual' },
             'OJOS CERRADOS': { label: 'Ojos Cerrados', icon: '😴', color: '#17a2b8', class: 'status-ojos-cerrados' },
             'DISTRACCION': { label: 'Distracción', icon: '❌', color: '#dc3545', class: 'status-distraccion' },
             'Iniciando...': { label: 'Iniciando', icon: '⏳', color: '#6c757d', class: 'status-iniciando' }
         };
+        const statusToNumeric = { 'ATENTO': 3, 'SIN ATENCION VISUAL': 2, 'OJOS CERRADOS': 1, 'DISTRACCION': 0, 'Iniciando...': -1 };
+        const numericToLabel = { 3: 'Atento', 2: 'Sin Atención', 1: 'Ojos Cerrados', 0: 'Distracción' };
+
+        const speechStatusConfig = {
+            'HABLA FLUIDA': { label: 'Habla Fluida', icon: '🗣️', class: 'status-habla-fluida' },
+            'HABLA LENTA': { label: 'Habla Lenta', icon: '🐢', class: 'status-habla-lenta' },
+            'DIFICULTAD DE FLUIDEZ': { label: 'Dificultad Fluidez', icon: '🚧', class: 'status-dificultad' },
+            'DIFICULTAD DE FORMULACIÓN': { label: 'Dificultad Form.', icon: '🚧', class: 'status-dificultad' },
+            'LENGUAJE DESESTRUCTURADO': { label: 'Desestructurado', icon: '🤯', class: 'status-dificultad' },
+            'POSIBLE POBREZA LÉXICA': { label: 'Pobreza Léxica', icon: '📉', class: 'status-habla-lenta' },
+            'HABLA SIMPLIFICADA': { label: 'Habla Simple', icon: '📉', class: 'status-habla-lenta' },
+            'HABLA MUY CORTA': { label: 'Habla Corta', icon: '...', class: 'status-escuchando' },
+            'ESCUCHANDO...': { label: 'Escuchando...', icon: '🎧', class: 'status-escuchando' }
+        };
 
         function changeStudent(studentId) {
             if (currentStudentId === studentId) return;
-
             if (realtimeStatusRef) realtimeStatusRef.off();
             if (logsRef) logsRef.off();
 
             currentStudentId = studentId;
-            
             realtimeStatusRef = database.ref(`analysis/${studentId}`);
-            logsRef = database.ref(`analysis_logs/${studentId}`);
+            logsRef = database.ref(`analysis_logs/${studentId}`).limitToLast(500); // Tomar más logs para promedios
 
             document.querySelectorAll('.student-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`btn-${studentId}`).classList.add('active');
@@ -143,7 +172,8 @@
         function listenToData() {
             realtimeStatusRef.on('value', (snapshot) => {
                 const data = snapshot.val();
-                updateRealtimeCard(data ? data.status : 'Iniciando...', data ? data.timestamp : new Date().toISOString());
+                updateRealtimeCard(data ? data.attention_status : 'Iniciando...', data ? data.timestamp : new Date().toISOString());
+                updateSpeechCard(data ? data.speech_status : 'ESCUCHANDO...');
             });
 
             logsRef.on('value', (snapshot) => {
@@ -159,20 +189,41 @@
 
         function resetDashboard() {
             updateRealtimeCard('Iniciando...', new Date().toISOString());
+            updateSpeechCard('ESCUCHANDO...');
             kpiAlerts.innerText = '0';
             kpiFocusTime.innerText = '0%';
             kpiSessionDuration.innerText = '00:00';
-            if (summaryChart) summaryChart.destroy();
+            kpiSpeechAlerts.innerText = '0';
+            kpiSpeechPPM.innerText = '0';
+            
             if (timelineChart) timelineChart.destroy();
+            initEmptyCharts();
+        }
+        
+        function initEmptyCharts() {
+             if (timelineChart) timelineChart.destroy();
+             timelineChart = new Chart(timelineCtx, {
+                type: 'bar',
+                data: { labels: ['...'], datasets: [{ label: 'Nivel de Atención', data: [], borderColor: '#4f46e5', fill: true, type: 'line' }, { label: 'Alertas de Fluidez', data: [], backgroundColor: '#fd7e14' }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { 'y-attention': { min: 0, max: 3 }, 'y-speech': { min: 0 } } }
+             });
         }
 
         function updateRealtimeCard(status, timestamp) {
-            const config = statusConfig[status] || statusConfig['Iniciando...'];
+            const config = attentionStatusConfig[status] || attentionStatusConfig['Iniciando...'];
             statusCard.className = `p-6 rounded-2xl shadow-lg transition-all duration-500 ${config.class}`;
             statusIcon.innerText = config.icon;
             statusText.innerText = config.label;
             const date = new Date(timestamp);
             timestampEl.innerText = `Actualizado: ${date.toLocaleTimeString()}`;
+        }
+
+        function updateSpeechCard(status) {
+            const baseStatus = String(status).split(' (')[0].trim();
+            const config = speechStatusConfig[baseStatus] || speechStatusConfig['ESCUCHANDO...'];
+            speechStatusCard.className = `p-6 rounded-2xl shadow-lg transition-all duration-500 ${config.class}`;
+            speechStatusIcon.innerText = config.icon;
+            speechStatusText.innerText = config.label;
         }
 
         function formatDuration(seconds) {
@@ -185,61 +236,176 @@
             const logEntries = Object.values(logs).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
             if (logEntries.length < 2) return;
 
-            const totalDuration = (new Date().getTime() - new Date(logEntries[0].timestamp).getTime()) / 1000;
+            const startTime = new Date(logEntries[0].timestamp).getTime();
+            const endTime = new Date().getTime();
+            const totalDuration = (endTime - startTime) / 1000;
             if (totalDuration <= 0) return;
 
-            const timeInState = { 'ATENTO': 0, 'SIN ATENCION VISUAL': 0, 'OJOS CERRADOS': 0, 'DISTRACCION': 0 };
-            let alertCount = 0;
+            const timeInState = { 'ATENTO': 0, 'SIN ATENCION VISUAL': 0, 'OJOS CERRADOS': 0, 'DISTRACCION': 0, 'Iniciando...': 0 };
+            let attentionAlertCount = 0;
+            let speechAlertCount = 0;
+            let totalPPM = 0;
+            let speechSegments = 0;
 
             for (let i = 0; i < logEntries.length - 1; i++) {
                 const currentLog = logEntries[i];
                 const nextLog = logEntries[i + 1];
                 const duration = (new Date(nextLog.timestamp).getTime() - new Date(currentLog.timestamp).getTime()) / 1000;
                 
-                if (timeInState.hasOwnProperty(currentLog.status)) {
-                    timeInState[currentLog.status] += duration;
+                const attentionStatus = currentLog.attention_status || 'Iniciando...';
+                if (timeInState.hasOwnProperty(attentionStatus)) {
+                    timeInState[attentionStatus] += duration;
+                }
+                if (attentionStatus === 'SIN ATENCION VISUAL' || attentionStatus === 'DISTRACCION') {
+                    attentionAlertCount++;
                 }
 
-                if (currentLog.status !== 'ATENTO' && currentLog.status !== 'Iniciando...') {
-                    alertCount++;
+                const speechStatus = String(currentLog.speech_status).split(' (')[0].trim();
+                const isSpeechAlert = speechStatus && speechStatus !== 'HABLA FLUIDA' && speechStatus !== 'ESCUCHANDO...' && speechStatus !== 'HABLA MUY CORTA';
+                if (isSpeechAlert) {
+                    speechAlertCount++;
+                }
+                if (currentLog.speech_metrics && currentLog.speech_metrics.ppm && currentLog.speech_metrics.ppm > 0) {
+                    totalPPM += currentLog.speech_metrics.ppm;
+                    speechSegments++;
+                }
+            }
+            
+            // Actualizar KPIs
+            kpiAlerts.innerText = attentionAlertCount;
+            const totalVisualTime = timeInState['ATENTO'] + timeInState['SIN ATENCION VISUAL'] + timeInState['OJOS CERRADOS'] + timeInState['DISTRACCION'];
+            const focusPercentage = totalVisualTime > 0 ? (timeInState['ATENTO'] / totalVisualTime) * 100 : 0;
+            kpiFocusTime.innerText = `${Math.round(focusPercentage)}%`;
+            kpiSessionDuration.innerText = formatDuration(totalDuration);
+            kpiSpeechAlerts.innerText = speechAlertCount;
+            const avgPPM = speechSegments > 0 ? Math.round(totalPPM / speechSegments) : 0;
+            kpiSpeechPPM.innerText = `${avgPPM}`;
+
+            // [NUEVO] Agregar datos para el gráfico
+            const aggregatedData = aggregateLogsByMinute(logEntries);
+            updateTimelineChart(aggregatedData);
+        }
+
+        // [NUEVO] Función para agregar datos por minuto
+        function aggregateLogsByMinute(logEntries) {
+            const buckets = {}; // { 'HH:mm': { totalAttention: 0, attentionCount: 0, speechAlerts: 0 } }
+
+            for (const log of logEntries) {
+                const timestamp = new Date(log.timestamp);
+                const minuteKey = new Date(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate(), timestamp.getHours(), timestamp.getMinutes()).getTime();
+
+                if (!buckets[minuteKey]) {
+                    buckets[minuteKey] = {
+                        totalAttention: 0,
+                        attentionCount: 0,
+                        speechAlerts: 0
+                    };
+                }
+                
+                // Agregar atención
+                const attentionLevel = statusToNumeric[log.attention_status];
+                if (attentionLevel > -1) { // Ignorar 'Iniciando...'
+                    buckets[minuteKey].totalAttention += attentionLevel;
+                    buckets[minuteKey].attentionCount++;
+                }
+                
+                // Agregar alertas de habla
+                const speechStatus = String(log.speech_status).split(' (')[0].trim();
+                const isSpeechAlert = speechStatus && speechStatus !== 'HABLA FLUIDA' && speechStatus !== 'ESCUCHANDO...' && speechStatus !== 'HABLA MUY CORTA';
+                if (isSpeechAlert) {
+                    buckets[minuteKey].speechAlerts++;
                 }
             }
 
-            kpiAlerts.innerText = alertCount;
-            const focusPercentage = (timeInState['ATENTO'] / totalDuration) * 100;
-            kpiFocusTime.innerText = `${Math.round(focusPercentage)}%`;
-            kpiSessionDuration.innerText = formatDuration(totalDuration);
+            // Procesar los buckets para el gráfico
+            const chartLabels = [];
+            const attentionData = [];
+            const speechData = [];
+            
+            // Ordenar claves
+            const sortedKeys = Object.keys(buckets).sort((a, b) => a - b);
 
-            updateSummaryChart(timeInState);
-            updateTimelineChart(logEntries);
+            for (const key of sortedKeys) {
+                const bucket = buckets[key];
+                chartLabels.push(Number(key)); // Enviar el timestamp
+                
+                const avgAttention = bucket.attentionCount > 0 ? (bucket.totalAttention / bucket.attentionCount) : 0;
+                attentionData.push(avgAttention);
+                speechData.push(bucket.speechAlerts);
+            }
+            
+            return { labels: chartLabels, attentionData, speechData };
         }
 
-        function updateSummaryChart(timeInState) {
-            const data = {
-                labels: Object.keys(timeInState).map(s => statusConfig[s] ? statusConfig[s].label : 'Otro'),
-                datasets: [{ data: Object.values(timeInState), backgroundColor: Object.keys(timeInState).map(s => statusConfig[s] ? statusConfig[s].color : '#cccccc'), borderColor: '#ffffff', borderWidth: 4 }]
-            };
-            if (summaryChart) summaryChart.destroy();
-            summaryChart = new Chart(summaryCtx, { type: 'doughnut', data: data, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } } });
-        }
-
-        function updateTimelineChart(logEntries) {
-            const statusToNumeric = { 'ATENTO': 3, 'SIN ATENCION VISUAL': 2, 'OJOS CERRADOS': 1, 'DISTRACCION': 0 };
-            const data = {
-                labels: logEntries.map(log => new Date(log.timestamp).toLocaleTimeString()),
-                datasets: [{
-                    label: 'Nivel de Atención', data: logEntries.map(log => statusToNumeric[log.status] ?? 0),
-                    borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, stepped: true, tension: 0.1
-                }]
-            };
+        // [MODIFICADO] Gráfico de doble eje para promedios
+        function updateTimelineChart(aggregatedData) {
             if (timelineChart) timelineChart.destroy();
+            
             timelineChart = new Chart(timelineCtx, {
-                type: 'line', data: data,
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: function(value) { const label = Object.keys(statusToNumeric).find(key => statusToNumeric[key] === value); return statusConfig[label] ? statusConfig[label].label : ''; } }, min: 0, max: 3 } }, plugins: { legend: { display: false } } }
+                type: 'bar',
+                data: {
+                    labels: aggregatedData.labels,
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Nivel de Atención (Promedio)',
+                            data: aggregatedData.attentionData,
+                            borderColor: '#4f46e5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            fill: true,
+                            stepped: true,
+                            yAxisID: 'y-attention' // Eje Izquierdo
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Alertas de Fluidez (Total)',
+                            data: aggregatedData.speechData,
+                            backgroundColor: 'rgba(253, 126, 20, 0.7)',
+                            yAxisID: 'y-speech' // Eje Derecho
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: 'minute', displayFormats: { minute: 'HH:mm' } },
+                            ticks: { autoSkip: true, maxTicksLimit: 15, maxRotation: 0 }
+                        },
+                        // [NUEVO] Eje Y Izquierdo para Atención
+                        'y-attention': {
+                            type: 'linear',
+                            position: 'left',
+                            min: 0,
+                            max: 3,
+                            title: { display: true, text: 'Nivel de Atención' },
+                            ticks: {
+                                callback: function(value) { return numericToLabel[value] || ''; }
+                            }
+                        },
+                        // [NUEVO] Eje Y Derecho para Alertas de Habla
+                        'y-speech': {
+                            type: 'linear',
+                            position: 'right',
+                            min: 0,
+                            title: { display: true, text: 'Nro. de Alertas de Fluidez' },
+                            grid: {
+                                drawOnChartArea: false, // No superponer la cuadrícula
+                            },
+                            ticks: {
+                                precision: 0 // Mostrar solo números enteros
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
             });
         }
         
-        // Iniciar con el primer estudiante por defecto al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
             changeStudent('est_01');
         });
